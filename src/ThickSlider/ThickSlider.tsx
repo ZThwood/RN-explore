@@ -1,7 +1,7 @@
-import { observable } from 'mobx';
-import { observer } from 'mobx-react';
-import React, { Component } from 'react';
-import CKSliderAxis, { AxisProps, SliderProps } from './CKSliderAxis';
+import {observable} from 'mobx';
+import {observer} from 'mobx-react';
+import React, {Component} from 'react';
+import CKSliderAxis, {AxisProps, SliderProps} from './SliderAxis';
 
 type ContentWidth = number;
 type ContentHeight = number;
@@ -22,7 +22,7 @@ class CKThickSlider extends Component<LineProps> {
   _ref: CKSliderAxis | null = null;
 
   render() {
-    return <CKSliderAxis ref={(ref) => (this._ref = ref)} {...this.props} />;
+    return <CKSliderAxis ref={ref => (this._ref = ref)} {...this.props} />;
   }
 }
 

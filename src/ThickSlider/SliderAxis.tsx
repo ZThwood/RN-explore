@@ -1,12 +1,14 @@
-import { observer } from 'mobx-react';
-import React, { Component } from 'react';
+import {observer} from 'mobx-react';
+import React, {Component} from 'react';
 import {
+  Animated,
+  Easing,
   ImageSourcePropType,
   LayoutChangeEvent,
   LayoutRectangle,
   PanResponder,
 } from 'react-native';
-import { observable } from 'mobx';
+import {observable} from 'mobx';
 import Svg, {
   G,
   Use,
@@ -20,6 +22,9 @@ import Svg, {
   Stop,
   Color,
 } from 'react-native-svg';
+
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 type SliderWidth = number;
 type SlidertHeight = number;
@@ -225,7 +230,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
     onMoveShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponderCapture: () => true,
     onPanResponderTerminationRequest: () => true,
-    onPanResponderStart: (evt) => {
+    onPanResponderStart: evt => {
       this.handlePosition(
         evt.nativeEvent.locationX,
         evt.nativeEvent.locationY,
@@ -235,11 +240,11 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
       this.props.changePressingBrightState?.(true);
       return true;
     },
-    onPanResponderGrant: (_evt) => {
+    onPanResponderGrant: _evt => {
       this.props.start && this.props.start(this.percentX);
       return true;
     },
-    onPanResponderMove: (evt) => {
+    onPanResponderMove: evt => {
       this.supportRandomTune
         ? this.throttle(() => {
             this._move(this.percentX);
@@ -265,7 +270,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
   });
 
   _move = (bright, isLast = false) => {
-    const { move } = this.props;
+    const {move} = this.props;
     const now = new Date().getTime();
     if (now - this.lastTime < this.delayTime && !isLast) {
       return;
@@ -278,10 +283,11 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
     // console.log('heaw onLayout event: ', event.nativeEvent.layout);
     this._sliderLayout = event.nativeEvent.layout;
   };
+  animatedValue = new Animated.Value(0); // 添加这一行
 
   constructor(props: SliderProps & AxisProps) {
     super(props);
-    const { initValue } = this.props;
+    const {initValue} = this.props;
     this.initBottomRect();
     this.initTopRect();
     this.initCircle();
@@ -296,10 +302,12 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
     this.updatePositionX();
     this.delayTime = this.props?.delayTime ?? 250;
     this.supportRandomTune = this.props?.supportRandomTune ?? false;
+
+    this.animatedValue.setValue(this.percentX); // 初始化 animatedValue
   }
 
   setPosition = (position: number) => {
-    const { maxPerNum, minPerNum } = this.props;
+    const {maxPerNum, minPerNum} = this.props;
     this.percentX =
       position > maxPerNum
         ? maxPerNum
@@ -311,7 +319,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
 
   updatePositionX = () => {
     const [width] = this.props.size;
-    const { maxPerNum, minPerNum } = this.props;
+    const {maxPerNum, minPerNum} = this.props;
     const initCircleR =
       this.percentX <= minPerNum
         ? this.circleR
@@ -332,6 +340,14 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
         this.sliderRxRyWidth = 0;
       }
     }
+
+    // 添加动画
+    Animated.timing(this.animatedValue, {
+      toValue: this.insidePositionX,
+      duration: 400, // 动画持续时间
+      easing: Easing.ease,
+      useNativeDriver: false, // 使用原生驱动
+    }).start();
   };
 
   initBottomRect = () => {
@@ -417,7 +433,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
       return;
     }
     const [width] = this.props.size;
-    const { maxPerNum, minPerNum } = this.props;
+    const {maxPerNum, minPerNum} = this.props;
     if (this.showTouchBtn) {
       if (x < this.paddingHorizontal + this.circleR) {
         // this.insidePositionX =
@@ -481,7 +497,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
   };
 
   render() {
-    const { gradientColors, useGradient } = this.props;
+    const {gradientColors, useGradient} = this.props;
     const [width, height] = this.props.size;
     let textX = this.topFontSize;
     const insideTextString =
@@ -548,7 +564,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
       <Svg
         width={width + this.paddingHorizontal * 2}
         height={svgHeight}
-        onLayout={(event) => this._onLayout(event)}
+        onLayout={event => this._onLayout(event)}
         {...this.pan.panHandlers}>
         {useGradientFinal ? (
           <Defs>
@@ -579,10 +595,10 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
         </Defs>
         <Defs>
           <G id="sliderTop">
-            <Rect
+            <AnimatedRect
               x={this.paddingHorizontal}
               y={CIRCLE_UOTSIDE_HEIGHT / 2 + this.sliderRxRyWidth}
-              width={this.insidePositionX}
+              width={this.animatedValue}
               height={height - CIRCLE_UOTSIDE_HEIGHT - 2 * this.sliderRxRyWidth}
               rx={this.topRadiusRx}
               ry={this.topRadiusRy}
@@ -596,8 +612,8 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
         </Defs>
         <Defs>
           <G id="sliderButton">
-            <Circle
-              cx={this.insidePositionX}
+            <AnimatedCircle
+              cx={this.animatedValue}
               cy={height / 2}
               r={this.circleR}
               stroke={this.circleStrokeColor}
@@ -645,6 +661,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
           </Text>
         ) : null}
         <Use href="#sliderBottom" x="0" y={useYHeight} />
+        <Use href="#sliderTop" x="0" y={useYHeight} />
         <Use href="#sliderTop" x="0" y={useYHeight} />
         {this.showTouchBtn ? (
           <Use href="#sliderButton" x="0" y={useYHeight} />

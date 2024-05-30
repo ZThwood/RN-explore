@@ -25,10 +25,12 @@
     "react": "17.0.2",
     "react-native": "0.68.7",
     "react-native-document-picker": "^9.2.0",
-    "react-native-threads": "^0.0.19"
+    "react-native-threads": "^0.0.19",
+    "react-native-svg": "^12.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@react-native-async-storage/async-storage": "^1.19.1",
     "@babel/plugin-proposal-decorators": "^7.24.6",
     "@babel/runtime": "^7.12.5",
     "@react-native-community/eslint-config": "^2.0.0",

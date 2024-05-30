@@ -30,7 +30,7 @@ import {Thread} from 'react-native-threads';
 import UploadFile from './uploadFile';
 import ImageList from './ImageList';
 import MobxPerformanceTest from './MobxPerformanceTest';
-import ComponentsTestScreen from './CKThickSlider/ComponentsTestScreen';
+import ComponentsTestScreen from './ThickSlider/ComponentsTestScreen';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -43,7 +43,7 @@ const App: () => Node = () => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      {/* <ScrollView
+      <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
@@ -51,9 +51,9 @@ const App: () => Node = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <UploadFile />
+          {/* <UploadFile /> */}
         </View>
-      </ScrollView> */}
+      </ScrollView>
       {/* <ImageList></ImageList> */}
       {/* <MobxPerformanceTest></MobxPerformanceTest> */}
       <ComponentsTestScreen></ComponentsTestScreen>

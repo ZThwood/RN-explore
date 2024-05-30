@@ -47,7 +47,7 @@
   "editor.formatOnSave": true,
   // 配置 VScode 使用 prettier 的 formatter
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
