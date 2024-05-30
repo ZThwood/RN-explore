@@ -9,7 +9,19 @@
     "test": "jest",
     "lint": "eslint ."
   },
+  "babel": {
+    "plugins": [
+      [
+        "@babel/plugin-proposal-decorators",
+        {
+          "legacy": true
+        }
+      ]
+    ]
+  },
   "dependencies": {
+    "mobx": "5.15.7",
+    "mobx-react": "6.1.4",
     "react": "17.0.2",
     "react-native": "0.68.7",
     "react-native-document-picker": "^9.2.0",
@@ -17,6 +29,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/plugin-proposal-decorators": "^7.24.6",
     "@babel/runtime": "^7.12.5",
     "@react-native-community/eslint-config": "^2.0.0",
     "@types/react-native": "^0.68.7",
