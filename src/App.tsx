@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import type {Node} from 'react';
 import {
   SafeAreaView,
@@ -31,32 +31,96 @@ import UploadFile from './uploadFile';
 import ImageList from './ImageList';
 import MobxPerformanceTest from './MobxPerformanceTest';
 import ComponentsTestScreen from './ThickSlider/ComponentsTestScreen';
+import SimpleSlider from './ThickSlider/BaseSlider';
+import ThinSliderNotAni from './ThickSlider/ThinSliderNotAni';
+import BrightnessSlider from './component/BrightnessSlider';
+import TimePicker from './PickerView/TimePicker';
+import Swiper from './component/Swiper';
+import CKThickSlider from './ThickSlider/ThickSlider';
+import TestColor from './component/TestColor';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [isSliding, setIsSliding] = useState(false);
+  const scrollViewRef = useRef(null);
 
   const backgroundStyle = {
     // backgroundColor: 'orange',
     flex: 1,
   };
+  // return <Swiper></Swiper>;
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <TestColor></TestColor>
+      {/* <ComponentsTestScreen /> */}
+    </View>
+  );
 
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+
       <ScrollView
+        scrollEnabled={!isSliding}
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
-        <View
+        {/* <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          {/* <UploadFile /> */}
-        </View>
+            height: 200,
+          }}></View> */}
+
+        {/* <BrightnessSlider
+          onSliding={setIsSliding}
+          scrollViewRef={scrollViewRef}
+        /> */}
+
+        {/* <ThinSliderNotAni
+          labelVisible={false}
+          width={300}
+          // thumbHeight={20}
+          trackHeight={65}
+          onSlidingComplete={value => {
+            console.log('[OperationCard] onSlidingComplete', {
+              value,
+            });
+            setIsSliding(false);
+          }}
+          disabled={false}
+          style={{marginRight: 14, alignItems: 'center'}}
+          value={22}
+          onValueChange={() => {
+            setIsSliding(true);
+          }}
+          // thumbColor={'#e9e9e9'}
+          // disabledThumbColor={'#e9e9e9'}
+          min={0}
+          max={100}
+        /> */}
+        {/* <View
+          style={{
+            backgroundColor: 'pink',
+            height: 200,
+            marginTop: 50,
+          }}></View>
+        <View
+          style={{
+            backgroundColor: 'skyblue',
+            height: 200,
+            marginTop: 50,
+          }}></View> */}
       </ScrollView>
       {/* <ImageList></ImageList> */}
       {/* <MobxPerformanceTest></MobxPerformanceTest> */}
-      <ComponentsTestScreen></ComponentsTestScreen>
+      {/* <ComponentsTestScreen></ComponentsTestScreen> */}
+      {/* <TimePicker onChange={() => {}} defaultValue={[]}></TimePicker> */}
     </SafeAreaView>
   );
 };

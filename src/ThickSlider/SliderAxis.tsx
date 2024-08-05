@@ -1,8 +1,6 @@
 import {observer} from 'mobx-react';
 import React, {Component} from 'react';
 import {
-  Animated,
-  Easing,
   ImageSourcePropType,
   LayoutChangeEvent,
   LayoutRectangle,
@@ -22,9 +20,6 @@ import Svg, {
   Stop,
   Color,
 } from 'react-native-svg';
-
-const AnimatedRect = Animated.createAnimatedComponent(Rect);
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 type SliderWidth = number;
 type SlidertHeight = number;
@@ -109,7 +104,11 @@ const TAG = 'CKSliderAxis ';
 @observer
 class CKSliderAxis extends Component<SliderProps & AxisProps> {
   @observable insidePositionX: number = 0; // 滑动的 x 轴距离
+  @observable insidePositionY: number = 0; // 滑动的 x 轴距离
+
   @observable percentX: number = 100; // 滑动值
+  @observable percentY: number = 100; // 滑动值
+
   @observable sliderRxRyWidth: number = 0; // rx，ry的动态滑动宽度，用户计算圆角时topSlider的高度以及坐标
   // 用来处理时间间隔的变量
   _intervalCache = new Date().getTime();
@@ -252,6 +251,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
         : this.debounce(() => {
             this._move(this.percentX);
           }, this.delayTime);
+
       this.handlePosition(
         evt.nativeEvent.locationX,
         evt.nativeEvent.locationY,
@@ -283,7 +283,6 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
     // console.log('heaw onLayout event: ', event.nativeEvent.layout);
     this._sliderLayout = event.nativeEvent.layout;
   };
-  animatedValue = new Animated.Value(0); // 添加这一行
 
   constructor(props: SliderProps & AxisProps) {
     super(props);
@@ -302,8 +301,6 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
     this.updatePositionX();
     this.delayTime = this.props?.delayTime ?? 250;
     this.supportRandomTune = this.props?.supportRandomTune ?? false;
-
-    this.animatedValue.setValue(this.percentX); // 初始化 animatedValue
   }
 
   setPosition = (position: number) => {
@@ -326,6 +323,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
         : this.percentX >= maxPerNum
         ? -this.circleR
         : 0;
+
     if (this.showTouchBtn) {
       this.insidePositionX =
         (this.percentX / maxPerNum) * width +
@@ -340,14 +338,6 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
         this.sliderRxRyWidth = 0;
       }
     }
-
-    // 添加动画
-    Animated.timing(this.animatedValue, {
-      toValue: this.insidePositionX,
-      duration: 400, // 动画持续时间
-      easing: Easing.ease,
-      useNativeDriver: false, // 使用原生驱动
-    }).start();
   };
 
   initBottomRect = () => {
@@ -428,31 +418,41 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
   };
 
   handlePosition = (x: number, y: number, pageX: number, pageY: number) => {
-    console.log(TAG, 'xxxxx:', x);
+    console.log(TAG, '当前xy:', x, y);
     if (x === pageX || y === pageY) {
       return;
     }
-    const [width] = this.props.size;
-    const {maxPerNum, minPerNum} = this.props;
-    if (this.showTouchBtn) {
-      if (x < this.paddingHorizontal + this.circleR) {
-        // this.insidePositionX =
-        //   (minPerNum / maxPerNum) * width + this.circleR + this.paddingHorizontal;
-        this.insidePositionX = this.paddingHorizontal + this.circleR;
-        this.percentX = minPerNum;
-      } else if (x > width + this.paddingHorizontal - this.circleR) {
-        this.insidePositionX = width + this.paddingHorizontal - this.circleR;
-        this.percentX = maxPerNum;
+    const [width, height] = this.props.size;
+    const {maxPerNum, minPerNum} = {maxPerNum: 100, minPerNum: 0};
+    const direction = 'vertical';
+    if (direction === 'vertical') {
+      if (y < this.paddingHorizontal) {
+        // this.insidePositionX = (minPerNum / maxPerNum) * width;
+        this.sliderRxRyWidth = 0;
+        this.insidePositionY = 0;
+        this.percentY = minPerNum;
+      } else if (y > height + this.paddingHorizontal) {
+        this.sliderRxRyWidth = 0;
+        this.insidePositionY = height;
+        this.percentY = maxPerNum;
       } else {
-        this.insidePositionX = x;
-        const finalInsidePoX =
-          this.insidePositionX - this.paddingHorizontal - this.circleR;
-        const scrollWidth = width - 2 * this.circleR;
-        this.percentX =
+        this.insidePositionY = y - this.paddingHorizontal;
+
+        if (this.insidePositionY < this.topRadiusRy) {
+          // 此时计算sliderRxRyWidth值
+          this.sliderRxRyWidth = this.topRadiusRy - this.insidePositionY;
+        } else {
+          this.sliderRxRyWidth = 0;
+        }
+        const finalInsidePoY = this.insidePositionY;
+        const scrollHeight = height;
+        this.percentY =
           minPerNum +
-          Math.floor((finalInsidePoX / scrollWidth) * (maxPerNum - minPerNum));
+          Math.floor((finalInsidePoY / scrollHeight) * (maxPerNum - minPerNum));
       }
-    } else {
+    }
+
+    if (direction !== 'vertical') {
       if (x < this.paddingHorizontal) {
         // this.insidePositionX = (minPerNum / maxPerNum) * width;
         this.sliderRxRyWidth = 0;
@@ -461,10 +461,12 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
       } else if (x > width + this.paddingHorizontal) {
         this.sliderRxRyWidth = 0;
         this.insidePositionX = width;
+        this.insidePositionY = height;
         this.percentX = maxPerNum;
       } else {
         this.insidePositionX = x - this.paddingHorizontal;
-        console.log(TAG, 'zouzheli?:', this.insidePositionX);
+        this.insidePositionY = y - this.paddingHorizontal;
+
         if (this.insidePositionX < this.topRadiusRx) {
           // 此时计算sliderRxRyWidth值
           this.sliderRxRyWidth = this.topRadiusRx - this.insidePositionX;
@@ -476,24 +478,15 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
         this.percentX =
           minPerNum +
           Math.floor((finalInsidePoX / scrollWidth) * (maxPerNum - minPerNum));
-        console.log(
-          TAG,
-          'percentX!:',
-          this.percentX,
-          'minPerNum:',
-          minPerNum,
-          'finalInsidePoX:',
-          finalInsidePoX,
-          'scrollWidth:',
-          scrollWidth,
-          'maxPerNum:',
-          maxPerNum,
-          'minPerNum:',
-          minPerNum,
-        );
       }
     }
-    console.log(TAG, 'percentX change:', this.percentX);
+
+    console.log(TAG, '移动位置最终计算结果', {
+      percentX: this.percentX,
+      insidePositionX: this.insidePositionX,
+      percentY: this.percentY,
+      insidePositionY: this.insidePositionY,
+    });
   };
 
   render() {
@@ -580,6 +573,7 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
             </LinearGradient>
           </Defs>
         ) : null}
+        {/* 底色 */}
         <Defs>
           <G id="sliderBottom">
             <Rect
@@ -593,13 +587,34 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
             />
           </G>
         </Defs>
-        <Defs>
+
+        {/* 填充 */}
+        {/* <Defs>
           <G id="sliderTop">
-            <AnimatedRect
+            <Rect
               x={this.paddingHorizontal}
               y={CIRCLE_UOTSIDE_HEIGHT / 2 + this.sliderRxRyWidth}
-              width={this.animatedValue}
+              width={this.insidePositionX}
               height={height - CIRCLE_UOTSIDE_HEIGHT - 2 * this.sliderRxRyWidth}
+              rx={this.topRadiusRx}
+              ry={this.topRadiusRy}
+              fill={
+                useGradientFinal
+                  ? 'url(#horizontal-gradient)'
+                  : this.topFillColor
+              }
+            />
+          </G>
+        </Defs> */}
+
+        <Defs>
+          <G id="sliderTop">
+            <Rect
+              x={this.paddingHorizontal}
+              y={CIRCLE_UOTSIDE_HEIGHT / 2 + this.sliderRxRyWidth}
+              // width={this.insidePositionX}
+              width={width}
+              height={this.insidePositionY}
               rx={this.topRadiusRx}
               ry={this.topRadiusRy}
               fill={
@@ -612,8 +627,8 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
         </Defs>
         <Defs>
           <G id="sliderButton">
-            <AnimatedCircle
-              cx={this.animatedValue}
+            <Circle
+              cx={this.insidePositionX}
               cy={height / 2}
               r={this.circleR}
               stroke={this.circleStrokeColor}
@@ -660,9 +675,8 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
             {this.percentX + (this.topTextUnit ? this.topTextUnit : '')}
           </Text>
         ) : null}
-        <Use href="#sliderBottom" x="0" y={useYHeight} />
-        <Use href="#sliderTop" x="0" y={useYHeight} />
-        <Use href="#sliderTop" x="0" y={useYHeight} />
+        <Use href="#sliderBottom" x="0" y={-useYHeight} />
+        <Use href="#sliderTop" x="0" y={-useYHeight} />
         {this.showTouchBtn ? (
           <Use href="#sliderButton" x="0" y={useYHeight} />
         ) : null}

@@ -2,6 +2,7 @@ import React from 'react';
 import {View, StyleSheet, Button} from 'react-native';
 import CKSlider from './SliderAxis';
 import {Text} from 'react-native';
+import ThinSliderNotAni from './ThinSliderNotAni';
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -15,6 +16,8 @@ export default class ComponentsTestScreen extends React.Component {
     super(props);
     this.state = {
       positionX: 0,
+      checked: false,
+      show: true,
     };
   }
 
@@ -66,17 +69,23 @@ export default class ComponentsTestScreen extends React.Component {
         fontColor: 'white',
       },
       style: {
-        wrapMarginTop: 10,
-        wrapMarginBottom: 20,
+        // wrapMarginTop: 10,
+        // wrapMarginBottom: 20,
       },
     };
+
+    const borderRadius = 20;
     return (
       <View
         style={[
-          StyleSheet.absoluteFill,
+          // StyleSheet.absoluteFill,
           {
             alignItems: 'center',
             justifyContent: 'center',
+            marginBottom: 10,
+            marginHorizontal: 10,
+            borderRadius: 20,
+            backgroundColor: 'green',
           },
         ]}>
         <View
@@ -86,6 +95,16 @@ export default class ComponentsTestScreen extends React.Component {
             width: '50%',
             marginBottom: 100,
           }}>
+          <Button
+            title={'show'}
+            onPress={() => {
+              this.setState({show: !this.state.show});
+            }}></Button>
+          <Button
+            title={'check'}
+            onPress={() => {
+              this.setState({checked: !this.state.checked});
+            }}></Button>
           <Button
             title={'开始'}
             onPress={() => {
@@ -100,22 +119,59 @@ export default class ComponentsTestScreen extends React.Component {
             }}></Button>
           <Text>{this.state.positionX}</Text>
         </View>
-        <CKSlider
-          ref={ref => (this._CKSliderAxisRef = ref)}
-          move={this.onMove}
-          release={this.reset}
-          maxPerNum={100}
-          minPerNum={0}
-          initValue={this.state.positionX}
-          delayTime={250}
-          borderRadius={5}
-          size={[300, 70]}
-          supportRandomTune={true}
-          {...options}
-        />
+
+        {this.state.show && (
+          <View>
+            {/* 蒙版 */}
+            {/* {!this.state.checked ? null : (
+              <View
+                style={[
+                  styles.maskStyle,
+                  {
+                    borderRadius: borderRadius,
+                  },
+                ]}
+                onStartShouldSetResponderCapture={() => true}
+              />
+            )} */}
+
+            <View
+              style={{
+                width: 250,
+                height: 65,
+                // backgroundColor: 'pink',
+                borderRadius: 20,
+                // overflow: 'hidden',
+                marginBottom: 100,
+              }}>
+              <CKSlider
+                ref={ref => (this._CKSliderAxisRef = ref)}
+                move={this.onMove}
+                maxPerNum={100}
+                minPerNum={0}
+                initValue={this.state.positionX}
+                borderRadius={borderRadius}
+                // size={[200, 65]}
+                size={[65, 300]}
+                // supportRandomTune={true}
+                {...options}
+              />
+            </View>
+          </View>
+        )}
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  maskStyle: {
+    position: 'absolute',
+    top: 10,
+    left: 1,
+    bottom: 20,
+    right: 1,
+    zIndex: 1000000,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+});

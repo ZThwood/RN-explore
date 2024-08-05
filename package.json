@@ -20,25 +20,33 @@
     ]
   },
   "dependencies": {
+    "@ant-design/react-native": "4.2.0",
+    "@react-native-community/cameraroll": "^4.1.2",
+    "@react-native-community/segmented-control": "^2.2.2",
+    "@react-native-community/slider": "4.5.0",
+    "@react-native-picker/picker": "^2.2.1",
+    "fbjs": "3.0.4",
     "mobx": "5.15.7",
     "mobx-react": "6.1.4",
     "react": "17.0.2",
     "react-native": "0.68.7",
     "react-native-document-picker": "^9.2.0",
-    "react-native-threads": "^0.0.19",
-    "react-native-svg": "^12.3.0"
+    "react-native-pager-view": "^5.4.9",
+    "react-native-svg": "^12.3.0",
+    "react-native-threads": "^0.0.19"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
-    "@react-native-async-storage/async-storage": "^1.19.1",
     "@babel/plugin-proposal-decorators": "^7.24.6",
     "@babel/runtime": "^7.12.5",
+    "@react-native-async-storage/async-storage": "^1.19.1",
     "@react-native-community/eslint-config": "^2.0.0",
     "@types/react-native": "^0.68.7",
     "babel-jest": "^26.6.3",
     "eslint": "^7.32.0",
     "jest": "^26.6.3",
     "metro-react-native-babel-preset": "^0.67.0",
+    "react-native-gesture-handler": "^2.3.2",
     "react-test-renderer": "17.0.2"
   },
   "jest": {
