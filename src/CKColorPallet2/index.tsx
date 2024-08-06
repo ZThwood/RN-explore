@@ -22,7 +22,6 @@ type CKColorPalletProps = {
   circleSize?: {width: number; height: number};
   circleSource?: ImageSourcePropType;
   hideCircle?: boolean;
-  useYAxisHue?: boolean; // 是否使用 Y 轴计算色相
 };
 
 type CKColorPalletState = {
@@ -33,7 +32,7 @@ type CKColorPalletState = {
 export const HSize = 360;
 export const SVSize = 100;
 
-const TAG = '[CKColorPallet ]';
+const TAG = 'CKColorPallet ';
 
 export default class CKColorPallet extends Component<
   CKColorPalletProps,
@@ -134,8 +133,8 @@ export default class CKColorPallet extends Component<
 
   getHSizeAndSVSize = () => {
     const {palletSize} = this.props;
-    const hSize = HSize; // 色相
-    const svSize = SVSize; // 饱和度
+    const hSize = HSize;
+    const svSize = SVSize;
     return {hSize, svSize};
   };
 
@@ -167,7 +166,6 @@ export default class CKColorPallet extends Component<
       locationY,
     );
     const {maxLeft, maxTop} = this.getMaxLeftAndTop();
-    console.log(TAG, '_onChangeColor maxLeft, maxTop', maxLeft, maxTop);
     const realLocationX =
       locationX < 0 ? 0 : locationX > maxLeft ? maxLeft : locationX;
     const realLocationY =
@@ -177,36 +175,22 @@ export default class CKColorPallet extends Component<
 
   // 根据坐标计算需要返回的颜色
   _onChangeColor = (pageX: number, pageY: number, isLast = false) => {
-    console.log(TAG, '改变颜色_onChangeColor', pageX, pageY);
-
-    const {onChangeColor, timeInterval, useYAxisHue} = this.props;
+    const {onChangeColor, timeInterval} = this.props;
     const now = new Date().getTime();
     if (now - this._intervalCache < timeInterval) {
       return;
     }
     this._intervalCache = now;
     const realPosition = this._getPosition(pageX, pageY);
-
     const {maxLeft: XSize, maxTop: YSize} = this.getMaxLeftAndTop();
     const {hSize, svSize} = this.getHSizeAndSVSize();
 
-    console.log(
-      TAG,
-      '改变颜色realPosition',
-      realPosition,
-      Math.abs(realPosition.y - YSize),
-    );
-    const hueOffset = useYAxisHue
-      ? Math.abs(realPosition.y - YSize) / YSize
-      : realPosition.x / XSize;
-    const saturabilityOffset = useYAxisHue
-      ? realPosition.x / XSize
-      : realPosition.y / YSize;
+    console.log(TAG, '改变颜色realPosition2', realPosition, {XSize, YSize});
 
-    const h = hueOffset * hSize; // 色相
-    const s = saturabilityOffset * svSize; // 饱和度
+    const h = (realPosition.x / XSize) * hSize;
+    const s = (realPosition.y / YSize) * svSize;
+    console.log(TAG, '改变颜色realPosition2 hs', h, s);
 
-    console.log(TAG, '改变颜色realPosition hs', h, s);
     const {r, g, b} = colorsys.hsv2Rgb(h, s, svSize);
     console.log(TAG, '_onChangeColor r,g,b', r, g, b, {
       XSize,
@@ -218,29 +202,15 @@ export default class CKColorPallet extends Component<
   };
 
   _rgb2Position = (r: number, g: number, b: number) => {
-    const {h, s} = colorsys.rgb2Hsv(r, g, b);
-    return this._getRealPosition(h, s);
-  };
-
-  _getRealPosition = (h: number, s: number) => {
     const {hSize, svSize} = this.getHSizeAndSVSize();
+    const {h, s} = colorsys.rgb2Hsv(r, g, b);
     const {maxLeft: XSize, maxTop: YSize} = this.getMaxLeftAndTop();
-
-    const {useYAxisHue} = this.props;
-    const hueOffset = h / hSize;
-    const saturabilityOffset = s / svSize;
-
-    let x = hueOffset * XSize;
-    let y = saturabilityOffset * YSize;
-
-    if (useYAxisHue) {
-      x = saturabilityOffset * XSize;
-      y = -(hueOffset * YSize) + YSize;
-    }
-    console.log(TAG, '_getRealPosition', YSize, {x, y});
-
+    console.log('init position:', h, hSize, XSize);
+    const x = (h / hSize) * XSize;
+    const y = (s / svSize) * YSize;
     return {x, y};
   };
+
   _updateCircle = (pageX: number, pageY: number) => {
     console.log('_updateCircle:', pageX, pageY);
     const realPosition = this._getPosition(pageX, pageY);
@@ -273,14 +243,13 @@ export default class CKColorPallet extends Component<
       }
       this._pickerFrame = {x, y, width, height};
       this._initDefaultColor();
-      console.log(TAG, 'this._pickerFrame init', this._pickerFrame);
     };
     InteractionManager.runAfterInteractions(() => {
       // 先获取一下位置
       this._contain &&
         this._contain.measureInWindow(
           (x: number, y: number, width: number, height: number) => {
-            updateFunc(x, y, width - 30, height);
+            updateFunc(x, y, width, height);
           },
         );
 
@@ -289,7 +258,7 @@ export default class CKColorPallet extends Component<
         this._contain &&
           this._contain.measureInWindow(
             (x: number, y: number, width: number, height: number) => {
-              updateFunc(x, y, width - 30, height);
+              updateFunc(x, y, width, height);
             },
           );
       }, 1000);
@@ -323,9 +292,6 @@ export default class CKColorPallet extends Component<
       this.props;
     // TODO 像 CKCCTPallet 一样去掉定时更新布局位置宽高的逻辑，暂时先加个 circleVisible prop 在外面控制不显示焦点圆圈
     // const showCircle = palletCirclePos.x >= 0 && palletCirclePos.y >= 0;
-
-    console.log(TAG, 'render', palletSize);
-
     return (
       <View
         ref={ref => (this._contain = ref)}

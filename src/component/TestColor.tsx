@@ -1,22 +1,28 @@
 import React, {useState} from 'react';
 import CKColorPallet from '../CKColorPallet';
+import CKColorPalletV2 from '../CKColorPallet2';
+
 import {Image, View} from 'react-native';
 
-const palletSize = {
-  width: 70,
-  height: 337,
-};
+// const palletSize = {
+//   width: 70,
+//   height: 337,
+// };
 
 // const palletSize = {
 //   width: 337,
 //   height: 70,
 // };
-const TestColor = () => {
-  const [selectedColor, setSelectedColor] = useState('#ff0000'); // 初始颜色为红色
+const defaultColor = {r: 234, g: 255, b: 140};
+const getColor = ({r, g, b}: {r: number; g: number; b: number}) => {
+  return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
+};
+const TestColor = ({palletSize, source, useV2, useYAxisHue}) => {
+  const [selectedColor, setSelectedColor] = useState(getColor(defaultColor)); // 初始颜色为红色
   const onChangeColor = (r: number, g: number, b: number) => {
     console.log('onChangeColor', r, g, b);
 
-    setSelectedColor(`#${r.toString(16)}${g.toString(16)}${b.toString(16)}`);
+    setSelectedColor(getColor({r, g, b}));
   };
 
   return (
@@ -26,18 +32,35 @@ const TestColor = () => {
           // transform: [{rotate: '-90deg'}],
         }
       }>
-      <CKColorPallet
-        defaultColor={{r: 255, g: 0, b: 0}}
-        onChangeColor={onChangeColor}
-        timeInterval={250}
-        palletSize={palletSize}
-        imgPickerComp={
-          <Image
-            source={require('../image/color_v.png')}
-            style={{width: palletSize.width, height: palletSize.height}}
-          />
-        }
-      />
+      {useV2 ? (
+        <CKColorPalletV2
+          defaultColor={defaultColor}
+          onChangeColor={onChangeColor}
+          timeInterval={250}
+          palletSize={palletSize}
+          imgPickerComp={
+            <Image
+              source={source}
+              style={{width: palletSize.width, height: palletSize.height}}
+            />
+          }
+        />
+      ) : (
+        <CKColorPallet
+          defaultColor={defaultColor}
+          onChangeColor={onChangeColor}
+          timeInterval={250}
+          palletSize={palletSize}
+          useYAxisHue={useYAxisHue}
+          imgPickerComp={
+            <Image
+              source={source}
+              style={{width: palletSize.width, height: palletSize.height}}
+            />
+          }
+        />
+      )}
+
       <View
         style={[
           {

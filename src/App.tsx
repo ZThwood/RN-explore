@@ -38,6 +38,7 @@ import TimePicker from './PickerView/TimePicker';
 import Swiper from './component/Swiper';
 import CKThickSlider from './ThickSlider/ThickSlider';
 import TestColor from './component/TestColor';
+import TestTemp from './component/TestTemp';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -57,7 +58,24 @@ const App: () => Node = () => {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      <TestColor></TestColor>
+      <TestTemp
+        palletSize={{
+          width: 70,
+          height: 337,
+        }}
+        // useYAxisHue
+        source={require('./image/temp_v.png')}
+        useYAxisHue={undefined}></TestTemp>
+
+      <TestTemp
+        palletSize={{
+          width: 337,
+          height: 70,
+        }}
+        // useYAxisHue={false}
+        // useV2
+        source={require('./image/temp.png')}
+        useYAxisHue={undefined}></TestTemp>
       {/* <ComponentsTestScreen /> */}
     </View>
   );
