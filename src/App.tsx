@@ -36,7 +36,7 @@ import ThinSliderNotAni from './ThickSlider/ThinSliderNotAni';
 import BrightnessSlider from './component/BrightnessSlider';
 import TimePicker from './PickerView/TimePicker';
 import Swiper from './component/Swiper';
-import CKThickSlider from './ThickSlider/ThickSlider';
+import ThickSlider from './ThickSlider/ThickSlider';
 import TestColor from './component/TestColor';
 import TestTemp from './component/TestTemp';
 

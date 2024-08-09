@@ -2,7 +2,7 @@ import React, {PureComponent, ReactNode} from 'react';
 import {Animated, ImageSourcePropType, PanResponder, View} from 'react-native';
 import ColorPickerSVG from './cct_color_picker.svg';
 
-type CKCCTPalletProps = {
+type CCTPalletProps = {
   circleVisible?: boolean; // 是否显示焦点，默认为 true
   timeInterval: number;
   defaultTemperature: number;
@@ -21,7 +21,7 @@ type CKCCTPalletProps = {
   useYAxisCCT?: boolean;
 };
 
-type CKCCTPalletState = {
+type CCTPalletState = {
   palletCirclePos: {x: number; y: number};
 };
 
@@ -39,16 +39,16 @@ const DefaultCircleSize = {
   height: 30,
 };
 
-const TAG = 'CKCCTPalletV2 ';
+const TAG = 'CCTPalletV2 ';
 
 /**
  * 冷暖色盘
  *
  * 这个组件固定0代表暖光 100代表冷光，外部使用的地方自行做转换，如果需要的话。
  */
-export default class CKCCTPalletV2 extends PureComponent<
-  CKCCTPalletProps,
-  CKCCTPalletState
+export default class CCTPalletV2 extends PureComponent<
+  CCTPalletProps,
+  CCTPalletState
 > {
   static defaultProps = {
     circleVisible: true,
@@ -125,7 +125,7 @@ export default class CKCCTPalletV2 extends PureComponent<
     },
   });
 
-  constructor(props: CKCCTPalletProps) {
+  constructor(props: CCTPalletProps) {
     super(props);
     const defaultPosition = this._temperature2Position(
       props.defaultTemperature,

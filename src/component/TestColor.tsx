@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import CKColorPallet from '../CKColorPallet';
-import CKColorPalletV2 from '../CKColorPallet2';
+import ColorPallet from '../ColorPallet';
+import ColorPalletV2 from '../ColorPallet2';
 
 import {Image, View} from 'react-native';
 
@@ -63,7 +63,7 @@ const TestColor = ({
         />
       )}
       {useV2 ? (
-        <CKColorPalletV2
+        <ColorPalletV2
           defaultColor={defaultColor}
           onChangeColor={onChangeColor}
           timeInterval={250}
@@ -76,7 +76,7 @@ const TestColor = ({
           }
         />
       ) : (
-        <CKColorPallet
+        <ColorPallet
           defaultColor={defaultColor}
           onChangeColor={onChangeColor}
           timeInterval={250}

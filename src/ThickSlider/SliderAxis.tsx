@@ -99,10 +99,10 @@ const CONTENT_BORDER_RADIUS = 10;
 const CIRCLE_UOTSIDE_HEIGHT = 0;
 const SLIDER_MARGIN_WIDTH = 2;
 
-const TAG = 'CKSliderAxis ';
+const TAG = 'SliderAxis ';
 
 @observer
-class CKSliderAxis extends Component<SliderProps & AxisProps> {
+class SliderAxis extends Component<SliderProps & AxisProps> {
   @observable insidePositionX: number = 0; // 滑动的 x 轴距离
   @observable insidePositionY: number = 0; // 滑动的 x 轴距离
 
@@ -687,4 +687,4 @@ class CKSliderAxis extends Component<SliderProps & AxisProps> {
     );
   }
 }
-export default CKSliderAxis;
+export default SliderAxis;

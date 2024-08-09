@@ -1,4 +1,4 @@
-export const CKColorPalletConfig = {
+export const ColorPalletConfig = {
   '4.7Inch': {
     SVSize: 122,
   },

@@ -1,7 +1,7 @@
 import {observable} from 'mobx';
 import {observer} from 'mobx-react';
 import React, {Component} from 'react';
-import CKSliderAxis, {AxisProps, SliderProps} from './SliderAxis';
+import SliderAxis, {AxisProps, SliderProps} from './SliderAxis';
 
 type ContentWidth = number;
 type ContentHeight = number;
@@ -17,13 +17,13 @@ interface LineProps extends AxisProps, SliderProps {
 }
 
 @observer
-class CKThickSlider extends Component<LineProps> {
+class ThickSlider extends Component<LineProps> {
   @observable positionX: number = 0; // 滑动的 x 轴距离
-  _ref: CKSliderAxis | null = null;
+  _ref: SliderAxis | null = null;
 
   render() {
-    return <CKSliderAxis ref={ref => (this._ref = ref)} {...this.props} />;
+    return <SliderAxis ref={ref => (this._ref = ref)} {...this.props} />;
   }
 }
 
-export default CKThickSlider;
+export default ThickSlider;

@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import CKColorPallet from '../CKColorPallet';
-import CKColorPalletV2 from '../CKColorPallet2';
+import ColorPallet from '../ColorPallet';
+import ColorPalletV2 from '../ColorPallet2';
 
 import {Image, Text, View} from 'react-native';
-import CKCCTPalletV2 from '../CKCCTPalletV2';
+import CCTPalletV2 from '../CCTPalletV2';
 
 // const palletSize = {
 //   width: 70,
@@ -33,7 +33,7 @@ const TestTemp = ({palletSize, source, useYAxisCCT}) => {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      <CKCCTPalletV2
+      <CCTPalletV2
         defaultTemperature={defaultTemperature}
         onChangeTemperature={onChangeTemperature}
         timeInterval={250}

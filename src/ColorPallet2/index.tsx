@@ -11,7 +11,7 @@ import ColorPickerSVG from './rgb_color_picker.svg';
 import colorsys from 'colorsys';
 import {observable} from 'mobx';
 
-type CKColorPalletProps = {
+type ColorPalletProps = {
   circleVisible?: boolean; // 是否显示焦点，默认为 true
   timeInterval: number;
   defaultShowPalletCircle?: boolean;
@@ -24,7 +24,7 @@ type CKColorPalletProps = {
   hideCircle?: boolean;
 };
 
-type CKColorPalletState = {
+type ColorPalletState = {
   palletCirclePos: {x: number; y: number};
   showPallet: boolean; // 是否显示色盘焦点
 };
@@ -32,11 +32,11 @@ type CKColorPalletState = {
 export const HSize = 360;
 export const SVSize = 100;
 
-const TAG = 'CKColorPallet ';
+const TAG = 'ColorPallet ';
 
-export default class CKColorPallet extends Component<
-  CKColorPalletProps,
-  CKColorPalletState
+export default class ColorPallet extends Component<
+  ColorPalletProps,
+  ColorPalletState
 > {
   static defaultProps = {
     circleVisible: true,
@@ -108,7 +108,7 @@ export default class CKColorPallet extends Component<
     },
   });
 
-  constructor(props: CKColorPalletProps) {
+  constructor(props: ColorPalletProps) {
     super(props);
     this.state = {
       palletCirclePos: {x: 0, y: 0},
@@ -290,7 +290,7 @@ export default class CKColorPallet extends Component<
     const {palletCirclePos} = this.state;
     const {imgPickerComp, circleVisible, palletSize, circleSize, circleSource} =
       this.props;
-    // TODO 像 CKCCTPallet 一样去掉定时更新布局位置宽高的逻辑，暂时先加个 circleVisible prop 在外面控制不显示焦点圆圈
+    // TODO 像 CCTPallet 一样去掉定时更新布局位置宽高的逻辑，暂时先加个 circleVisible prop 在外面控制不显示焦点圆圈
     // const showCircle = palletCirclePos.x >= 0 && palletCirclePos.y >= 0;
     return (
       <View

@@ -21,8 +21,8 @@ interface SliderProps extends BaseSliderProps {
   trackHeight?: number;
   thumbHeight?: number;
   thumbWidth?: number;
-  trackColor?: ColorValue;
-  disabledTrackColor?: ColorValue;
+  traColor?: ColorValue;
+  disabledTraColor?: ColorValue;
   thumbColor?: ColorValue;
   disabledThumbColor?: ColorValue;
   labelColor?: ColorValue;
@@ -64,8 +64,8 @@ class ThinSliderNotAni extends PureComponent<SliderProps, SliderState> {
     width: Dimensions.get('window').width,
     height: SLIDER_HEIGHT,
     thumbWidth: THUMB_SIZE,
-    trackColor: COLOR,
-    disabledTrackColor: COLOR_DISABLED,
+    traColor: COLOR,
+    disabledTraColor: COLOR_DISABLED,
     thumbColor: 'white',
     disabledThumbColor: 'white',
     labelVisible: false,
@@ -198,8 +198,8 @@ class ThinSliderNotAni extends PureComponent<SliderProps, SliderState> {
       multiple,
       width,
       height,
-      trackColor,
-      disabledTrackColor,
+      traColor,
+      disabledTraColor,
       style,
       onSlidingComplete,
       textStyle,
@@ -209,9 +209,7 @@ class ThinSliderNotAni extends PureComponent<SliderProps, SliderState> {
     } = this.props;
     const {animatedOffset, value} = this.state;
     const label = this.getLabel();
-    const minimumTrackBackgroundColor = disabled
-      ? disabledTrackColor
-      : trackColor;
+    const minimumTrackBackgroundColor = disabled ? disabledTraColor : traColor;
     return (
       <BaseSlider
         ref={ref => (this.baseSliderRef = ref)}

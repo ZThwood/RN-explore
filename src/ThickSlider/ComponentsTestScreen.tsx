@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, StyleSheet, Button} from 'react-native';
-import CKSlider from './SliderAxis';
+import Slider from './SliderAxis';
 import {Text} from 'react-native';
 import ThinSliderNotAni from './ThinSliderNotAni';
 function getRandomIntInclusive(min, max) {
@@ -25,7 +25,7 @@ export default class ComponentsTestScreen extends React.Component {
 
   updatePosition = x => {
     console.log('heaw updatePosition: ', x);
-    this._CKSliderAxisRef?.setPosition(x);
+    this._SliderAxisRef?.setPosition(x);
     this.setState({positionX: x});
   };
 
@@ -144,8 +144,8 @@ export default class ComponentsTestScreen extends React.Component {
                 // overflow: 'hidden',
                 marginBottom: 100,
               }}>
-              <CKSlider
-                ref={ref => (this._CKSliderAxisRef = ref)}
+              <Slider
+                ref={ref => (this._SliderAxisRef = ref)}
                 move={this.onMove}
                 maxPerNum={100}
                 minPerNum={0}
