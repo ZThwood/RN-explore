@@ -44,6 +44,7 @@ const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
   const [isSliding, setIsSliding] = useState(false);
   const scrollViewRef = useRef(null);
+  const [value, setValue] = useState(22);
 
   const backgroundStyle = {
     // backgroundColor: 'orange',
@@ -51,34 +52,40 @@ const App: () => Node = () => {
   };
   // return <Swiper></Swiper>;
 
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <TestTemp
-        palletSize={{
-          width: 70,
-          height: 337,
-        }}
-        // useYAxisHue
-        source={require('./image/temp_v.png')}
-        useYAxisHue={undefined}></TestTemp>
+  // return (
+  //   <View
+  //     style={{
+  //       flex: 1,
+  //       justifyContent: 'center',
+  //       alignItems: 'center',
+  //     }}>
+  //     {/* <TestTemp
+  //       palletSize={{
+  //         width: 70,
+  //         height: 337,
+  //       }}
+  //       source={require('./image/temp_v.png')}
+  //       useYAxisCCT={true}></TestTemp>
 
-      <TestTemp
-        palletSize={{
-          width: 337,
-          height: 70,
-        }}
-        // useYAxisHue={false}
-        // useV2
-        source={require('./image/temp.png')}
-        useYAxisHue={undefined}></TestTemp>
-      {/* <ComponentsTestScreen /> */}
-    </View>
-  );
+  //     <TestTemp
+  //       palletSize={{
+  //         width: 337,
+  //         height: 70,
+  //       }}
+  //       source={require('./image/temp.png')}
+  //       useYAxisCCT={undefined}></TestTemp> */}
+
+  //     {/* <TestColor
+  //       palletSize={{
+  //         width: 300,
+  //         height: 100,
+  //       }}
+  //       hideMask={false}
+  //       // borderRadius={16}
+  //       source={require('./image/rgb_pallet_picker.png')}
+  //       useYAxisCCT={false}></TestColor> */}
+  //   </View>
+  // );
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -99,21 +106,63 @@ const App: () => Node = () => {
           onSliding={setIsSliding}
           scrollViewRef={scrollViewRef}
         /> */}
-
-        {/* <ThinSliderNotAni
+        <TouchableWithoutFeedback
+          style={{
+            width: 100,
+            height: 100,
+            backgroundColor: 'pink',
+          }}
+          onPress={() => setValue(value + 10)}>
+          <Text
+            style={{
+              width: 100,
+              height: 100,
+              fontSize: 34,
+              backgroundColor: 'pink',
+            }}>
+            {'按我'}
+          </Text>
+        </TouchableWithoutFeedback>
+        <ThinSliderNotAni
           labelVisible={false}
-          width={300}
+          width={70}
           // thumbHeight={20}
-          trackHeight={65}
+          trackHeight={337}
           onSlidingComplete={value => {
             console.log('[OperationCard] onSlidingComplete', {
               value,
             });
             setIsSliding(false);
+            setValue(value);
           }}
           disabled={false}
           style={{marginRight: 14, alignItems: 'center'}}
-          value={22}
+          value={value}
+          onValueChange={() => {
+            setIsSliding(true);
+          }}
+          // thumbColor={'#e9e9e9'}
+          // disabledThumbColor={'#e9e9e9'}
+          useYAxis
+          min={0}
+          max={100}
+          height={337}
+        />
+
+        <ThinSliderNotAni
+          labelVisible={false}
+          width={337}
+          height={70}
+          onSlidingComplete={value => {
+            console.log('[OperationCard] onSlidingComplete', {
+              value,
+            });
+            setIsSliding(false);
+            setValue(value);
+          }}
+          disabled={false}
+          style={{marginRight: 14, alignItems: 'center'}}
+          value={value}
           onValueChange={() => {
             setIsSliding(true);
           }}
@@ -121,7 +170,7 @@ const App: () => Node = () => {
           // disabledThumbColor={'#e9e9e9'}
           min={0}
           max={100}
-        /> */}
+        />
         {/* <View
           style={{
             backgroundColor: 'pink',
@@ -135,6 +184,7 @@ const App: () => Node = () => {
             marginTop: 50,
           }}></View> */}
       </ScrollView>
+
       {/* <ImageList></ImageList> */}
       {/* <MobxPerformanceTest></MobxPerformanceTest> */}
       {/* <ComponentsTestScreen></ComponentsTestScreen> */}

@@ -17,7 +17,14 @@ const defaultColor = {r: 234, g: 255, b: 140};
 const getColor = ({r, g, b}: {r: number; g: number; b: number}) => {
   return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
 };
-const TestColor = ({palletSize, source, useV2, useYAxisHue}) => {
+const TestColor = ({
+  palletSize,
+  source,
+  useV2,
+  useYAxisHue,
+  hideMask,
+  borderRadius,
+}) => {
   const [selectedColor, setSelectedColor] = useState(getColor(defaultColor)); // 初始颜色为红色
   const onChangeColor = (r: number, g: number, b: number) => {
     console.log('onChangeColor', r, g, b);
@@ -27,11 +34,34 @@ const TestColor = ({palletSize, source, useV2, useYAxisHue}) => {
 
   return (
     <View
-      style={
+      style={[
         {
-          // transform: [{rotate: '-90deg'}],
-        }
-      }>
+          alignItems: 'center',
+          borderRadius: borderRadius ?? 12,
+          overflow: 'hidden',
+        },
+      ]}>
+      {/* 蒙版 */}
+      {hideMask ? null : (
+        <View
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              zIndex: 1000000,
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              borderRadius: 12,
+            },
+            {
+              borderRadius,
+              // height: '98%',
+            },
+          ]}
+        />
+      )}
       {useV2 ? (
         <CKColorPalletV2
           defaultColor={defaultColor}
@@ -61,7 +91,7 @@ const TestColor = ({palletSize, source, useV2, useYAxisHue}) => {
         />
       )}
 
-      <View
+      {/* <View
         style={[
           {
             marginTop: 20,
@@ -73,7 +103,7 @@ const TestColor = ({palletSize, source, useV2, useYAxisHue}) => {
           },
           {backgroundColor: selectedColor},
         ]}
-      />
+      /> */}
     </View>
   );
 };

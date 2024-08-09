@@ -18,6 +18,7 @@ type CKCCTPalletProps = {
   };
   useLocationY?: boolean;
   circleSource?: ImageSourcePropType;
+  useYAxisCCT?: boolean;
 };
 
 type CKCCTPalletState = {
@@ -210,6 +211,8 @@ export default class CKCCTPalletV2 extends PureComponent<
   };
 
   _temperature2Position = (temperature: number) => {
+    const {useYAxisCCT} = this.props;
+
     if (temperature == null || temperature === -1) {
       return {x: -1, y: -1};
     }
@@ -217,8 +220,15 @@ export default class CKCCTPalletV2 extends PureComponent<
     const CircleSize = this.getCircleSize();
     const XSize = PalletSize.width - CircleSize.width;
     const YSize = PalletSize.height - CircleSize.height;
-    const x = (temperature / TemperatureSize) * XSize;
-    const y = YSize * 0.5;
+
+    let x = (temperature / TemperatureSize) * XSize;
+    let y = YSize * 0.5;
+
+    if (useYAxisCCT) {
+      x = XSize * 0.5;
+      y = -((temperature / TemperatureSize) * YSize) + YSize;
+    }
+
     console.log(
       TAG,
       '_temperature2Position',
@@ -230,8 +240,15 @@ export default class CKCCTPalletV2 extends PureComponent<
   };
 
   _position2Temperature = (position: ReturnType<typeof this._getPosition>) => {
+    const {useYAxisCCT} = this.props;
     const PalletSize = this.getPalletSize();
     const CircleSize = this.getCircleSize();
+
+    if (useYAxisCCT) {
+      const YSize = PalletSize.height - CircleSize.height;
+      return (Math.abs(position.y - YSize) / YSize) * TemperatureSize;
+    }
+
     const XSize = PalletSize.width - CircleSize.width;
     return (position.x / XSize) * TemperatureSize;
   };

@@ -14,7 +14,7 @@ export enum SliderType {
 }
 
 export interface SliderAnimatedValues {
-  animatedX: Animated.Value;
+  animatedTarget: Animated.Value;
   animatedValue: Animated.AnimatedDivision;
   animatedOffset: Animated.AnimatedInterpolation;
 }
@@ -34,11 +34,14 @@ export interface BaseSliderProps {
   multiple?: number;
   // Slider 宽度
   width: number;
+  // Slider 高度
+  height: number;
   style?: StyleProp<ViewStyle>;
   // 拖动 Slider 过程中会持续回调
   onValueChange?: (value: number) => void;
   // 拖动 Slider 手势结束后回调
   onSlidingComplete?: (value: number) => void;
+  useYAxis?: boolean;
 }
 
 interface SliderSubComponentProps {
@@ -64,50 +67,69 @@ class BaseSlider extends PureComponent<BaseSliderComponentProps> {
     value: 0,
     step: 1,
     width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
   };
 
-  x: Animated.Value;
-  offset: Animated.AnimatedInterpolation;
+  animatedTarget: Animated.Value;
+  animatedOffset: Animated.AnimatedInterpolation;
   animatedValue: Animated.AnimatedDivision;
   onGestureEvent: PanGestureHandlerProperties['onGestureEvent'];
+  passiveControl = false;
 
   constructor(props: BaseSliderComponentProps) {
     super(props);
+    const {useYAxis, width, height} = props;
     const sliderValue = this.toSliderValue(props.value);
-    this.x = new Animated.Value(sliderValue * props.width);
-    this.offset = this.x.interpolate({
-      inputRange: [0, props.width],
-      outputRange: [0, props.width],
+    const maxSize = useYAxis ? height : width;
+
+    this.animatedTarget = new Animated.Value(sliderValue * maxSize);
+
+    this.animatedOffset = this.animatedTarget.interpolate({
+      inputRange: [0, maxSize],
+      outputRange: [0, maxSize],
       extrapolate: 'clamp',
     });
+
     this.animatedValue = Animated.divide(
-      this.offset,
-      new Animated.Value(props.width),
+      this.animatedOffset,
+      new Animated.Value(maxSize),
     );
+
     props.onAnimatedValue({
-      animatedX: this.x,
+      animatedTarget: this.animatedTarget,
       animatedValue: this.animatedValue,
-      animatedOffset: this.offset,
+      animatedOffset: this.animatedOffset,
     });
-    this.onGestureEvent = Animated.event(
-      [
-        {
-          nativeEvent: {x: this.x},
-        },
-      ],
-      {
-        useNativeDriver: false,
-      },
-    );
-    this.x.addListener(({value: x}) => {
-      const {width, onValueChange} = this.props;
-      let clampX = x;
-      if (clampX < 0) {
-        clampX = 0;
-      } else if (clampX > width) {
-        clampX = width;
+
+    this.onGestureEvent = event => {
+      const {y, x} = event.nativeEvent;
+      let processed = x;
+      if (this.props.useYAxis) {
+        processed = this.handleY(y);
       }
-      const v = clampX / width;
+      this.animatedTarget.setValue(processed); // 更新 y 的值
+    };
+
+    this.animatedTarget.addListener(event => {
+      if (this.passiveControl) {
+        return;
+      }
+      const {value} = event;
+      const {width, onValueChange, height, useYAxis} = this.props;
+
+      let v = 0;
+      if (useYAxis) {
+        v = value / height;
+      } else {
+        let clampX = value;
+        if (clampX < 0) {
+          clampX = 0;
+        } else if (clampX > width) {
+          clampX = width;
+        }
+        v = clampX / width;
+      }
+
       if (Number.isNaN(v)) {
         console.warn('[BaseSlider] on x listener value is', v);
         return;
@@ -118,6 +140,24 @@ class BaseSlider extends PureComponent<BaseSliderComponentProps> {
       }
     });
   }
+
+  handleY = (y: any) => {
+    const {height} = this.props;
+    let processedY = y - height;
+
+    if (processedY > 0) {
+      processedY = 0;
+    }
+
+    if (processedY < 0) {
+      processedY = Math.abs(processedY);
+      if (Math.abs(processedY) > height) {
+        processedY = height;
+      }
+    }
+
+    return processedY;
+  };
 
   componentDidUpdate(
     prevProps: Readonly<BaseSliderComponentProps>,
@@ -137,24 +177,36 @@ class BaseSlider extends PureComponent<BaseSliderComponentProps> {
         'state',
         this.state,
       );
-    // if (prevProps.value !== this.props.value) {
-    //   const sliderValue = this.toSliderValue(this.props.value);
-    //   this.x.setValue(sliderValue * this.props.width);
-    // }
   }
 
   handleGestureStateChange = (event: TapGestureHandlerStateChangeEvent) => {
-    const {width, onSlidingComplete} = this.props;
-    const {oldState, x} = event.nativeEvent || {};
+    const {width, onSlidingComplete, useYAxis, height} = this.props;
+    const {oldState, x, y} = event.nativeEvent || {};
+    this.passiveControl = false;
+
     if (oldState === State.ACTIVE) {
-      let clampX = x;
-      if (clampX < 0) {
-        clampX = 0;
-      } else if (clampX > width) {
-        clampX = width;
+      const processedY = this.handleY(y);
+      let v = 0;
+      if (useYAxis) {
+        let clampY = processedY;
+        if (clampY < 0) {
+          clampY = 0;
+        } else if (clampY > height) {
+          clampY = height;
+        }
+        v = clampY / height;
+        this.animatedTarget.setValue(clampY);
+      } else {
+        let clampX = x;
+        if (clampX < 0) {
+          clampX = 0;
+        } else if (clampX > width) {
+          clampX = width;
+        }
+        v = clampX / width;
+        this.animatedTarget.setValue(clampX);
       }
-      const v = clampX / width;
-      this.x.setValue(clampX);
+
       if (typeof onSlidingComplete === 'function') {
         const value = this.toValue(v);
         onSlidingComplete(value);
@@ -166,8 +218,16 @@ class BaseSlider extends PureComponent<BaseSliderComponentProps> {
 
   onPanHandlerStateChange = this.handleGestureStateChange;
 
+  setPosition = (value: number) => {
+    this.passiveControl = true;
+    const sliderValue = this.toSliderValue(value);
+    const sizeMax = this.props.useYAxis ? this.props.height : this.props.width;
+    const sliderValueToWidth = sliderValue * sizeMax;
+    this.animatedTarget.setValue(sliderValueToWidth);
+  };
+
   render(): React.ReactNode {
-    const {disabled, width, children, style} = this.props;
+    const {disabled, width, children, style, height} = this.props;
     return (
       <GestureHandlerRootView style={style}>
         <TapGestureHandler
@@ -177,7 +237,7 @@ class BaseSlider extends PureComponent<BaseSliderComponentProps> {
             enabled={!disabled}
             onGestureEvent={this.onGestureEvent}
             onHandlerStateChange={this.onPanHandlerStateChange}>
-            <Animated.View style={{width}}>{children}</Animated.View>
+            <Animated.View style={{height, width}}>{children}</Animated.View>
           </PanGestureHandler>
         </TapGestureHandler>
       </GestureHandlerRootView>

@@ -18,7 +18,7 @@ const defaultTemperature = 0;
 const getColor = ({r, g, b}: {r: number; g: number; b: number}) => {
   return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
 };
-const TestTemp = ({palletSize, source, useYAxisHue}) => {
+const TestTemp = ({palletSize, source, useYAxisCCT}) => {
   const [temp, setTemp] = useState(0); // 初始颜色为红色
   const onChangeTemperature = (temperature: number, isLast: boolean) => {
     console.log('onChangeTemperature', temperature, isLast);
@@ -44,6 +44,7 @@ const TestTemp = ({palletSize, source, useYAxisHue}) => {
           />
         }
         palletSize={palletSize}
+        useYAxisCCT={useYAxisCCT}
       />
 
       <Text>{temp}</Text>
